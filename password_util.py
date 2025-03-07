@@ -58,3 +58,16 @@ def calc_local_score(check_result: dict[str, bool]) -> tuple[int, int, int]:
         if value:
             score += 1
     return score, len(check_result), int(score / len(check_result) * 100)
+
+def check_sha_wordlist(hash_start: str) -> list[str]:
+    result: list[str] = []
+    hash_start_upper = hash_start.upper()
+    wordlist_dir = './password_lists/'
+    for wordlist_file in os.listdir(wordlist_dir):
+        if not wordlist_file.endswith('.sha1'):
+            continue
+        with open(os.path.join(wordlist_dir, wordlist_file), 'r') as file:
+            for line in file.read().splitlines():
+                if line.startswith(hash_start_upper):
+                    result.append(line[5:])
+    return result
