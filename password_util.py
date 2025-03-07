@@ -1,10 +1,13 @@
-from getpass import getpass
 import hashlib
-import requests
 import os
+from getpass import getpass
+
+import requests
+
 
 def get_password() -> str:
     return getpass()
+
 
 def check_have_i_been_pwned(password: str) -> tuple[bool, int]:
     sha1_password: str = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
@@ -16,6 +19,7 @@ def check_have_i_been_pwned(password: str) -> tuple[bool, int]:
         if h == suffix:
             return (True, int(count))
     return (False, 0)
+
 
 def check_password_local(password: str) -> dict[str, bool]:
     result: dict[str, bool] = {

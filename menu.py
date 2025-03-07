@@ -1,9 +1,12 @@
-from rich import print
 import os
+
+from rich import print
+
 from password_util import get_password, check_have_i_been_pwned, check_password_local, calc_local_score, \
     check_against_wordlists
 
 clear = lambda: os.system('cls' if os.name == 'nt' else 'clear')
+
 
 def print_menu() -> str:
     clear()
@@ -18,6 +21,7 @@ def print_menu() -> str:
     print("[green]=========================================[green]")
     print("[green]       Enter your choice (1-5):          [green]")
     return input()
+
 
 def handle_user_input(user_input: str):
     input_as_int: int | None = None
@@ -53,7 +57,9 @@ def handle_user_input(user_input: str):
                 check_result: tuple[bool, int] = check_have_i_been_pwned(password)
                 if check_result[0]:
                     print_message(f"Your password has been leaked {check_result[1]} times", "ERROR", "red")
-                    print_message("This does not mean that your user/password combination has been leaked. But the password will be in wordlists.\n\nYou can look at https://haveibeenpwned.com/ if your account has been leaked.", "INFORMATION", "yellow")
+                    print_message(
+                        "This does not mean that your user/password combination has been leaked. But the password will be in wordlists.\n\nYou can look at https://haveibeenpwned.com/ if your account has been leaked.",
+                        "INFORMATION", "yellow")
                 else:
                     print_message("Your password has not been leaked", "SUCCESS", "green")
         case 4:
@@ -62,12 +68,14 @@ def handle_user_input(user_input: str):
             print("[green]Exiting...[green]")
             exit(0)
 
-def print_message(message: str, header, color)-> None:
+
+def print_message(message: str, header: str, color:str) -> None:
     clear()
     print(f"[{color}]================={header}==================[{color}]\n")
     print(f"[{color}]{message}[{color}]\n")
     print("[green]Press return Key to continue...[green]")
     input()
+
 
 def print_rule_of_thumbs():
     clear()
@@ -83,6 +91,7 @@ def print_rule_of_thumbs():
     print("[green]=========================================[green]")
     print("[green]       Press return key to go back          [green]")
     input()
+
 
 def have_i_been_pwned_menu() -> str:
     clear()
@@ -102,6 +111,7 @@ def have_i_been_pwned_menu() -> str:
         return ""
     return password
 
+
 def check_password_local_menu() -> str:
     clear()
     print("[green]=========================================[green]")
@@ -119,7 +129,8 @@ def check_password_local_menu() -> str:
         return ""
     return password
 
-def print_local_result(check_result: dict[str,bool])->None:
+
+def print_local_result(check_result: dict[str, bool]) -> None:
     clear()
     score_info: tuple[int, int, int] = calc_local_score(check_result)
     score, total, percentage = score_info
