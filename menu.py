@@ -1,6 +1,6 @@
 from rich import print
 import os
-from password_util import get_password, check_have_i_been_pwned
+from password_util import get_password, check_have_i_been_pwned, check_password_local
 
 clear = lambda: os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -30,13 +30,13 @@ def handle_user_input(user_input: str):
 
     match input_as_int:
         case 1:
-            print("[green]Checking password strength...[green]")
+            password: str = check_password_local_menu()
         case 2:
-            password = have_i_been_pwned_menu()
+            password: str = have_i_been_pwned_menu()
             if not password:
                 return
             else:
-                check_result = check_have_i_been_pwned(password)
+                check_result: tuple[bool, int] = check_have_i_been_pwned(password)
                 if check_result[0]:
                     print_message(f"Your password has been leaked {check_result[1]} times", "ERROR", "red")
                     print_message("This does not mean that your user/password combination has been leaked. But the password will be in wordlists.\n\nYou can look at https://haveibeenpwned.com/ if your account has been leaked.", "INFORMATION", "yellow")
@@ -71,6 +71,7 @@ def print_rule_of_thumbs():
     input()
 
 def have_i_been_pwned_menu() -> str:
+    clear()
     print("[green]=========================================[green]")
     print("[green]        Check for Password Leak          [green]")
     print("[green]=========================================[green]")
@@ -81,8 +82,24 @@ def have_i_been_pwned_menu() -> str:
     print("[green] password will never be sent.            [green]")
     print("[green]=========================================[green]")
     print("[green]       Enter your password:              [green]")
-    print("[green]    (or Enter for previous menu)         [green]")
-    password = get_password()
+    print("[green]    (or return for previous menu)         [green]")
+    password: str = get_password()
+    if not password:
+        return ""
+    return password
+
+def check_password_local_menu() -> str:
+    clear()
+    print("[green]=========================================[green]")
+    print("[green]        Check Password Strength          [green]")
+    print("[green]=========================================[green]")
+    print("[green]             Information:                [green]")
+    print("[green] Your password will be checked against  [green]")
+    print("[green] the local password rules.               [green]")
+    print("[green]=========================================[green]")
+    print("[green]       Enter your password:              [green]")
+    print("[green]    (or return for previous menu)         [green]")
+    password: str = get_password()
     if not password:
         return ""
     return password
