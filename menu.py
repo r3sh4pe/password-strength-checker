@@ -37,17 +37,22 @@ def handle_user_input(user_input: str):
                 return
             else:
                 check_result = check_have_i_been_pwned(password)
+                if check_result[0]:
+                    print_message(f"Your password has been leaked {check_result[1]} times", "ERROR", "red")
+                    print_message("This does not mean that your user/password combination has been leaked. But the password will be in wordlists.\n\nYou can look at https://haveibeenpwned.com/ if your account has been leaked.", "INFORMATION", "yellow")
+                else:
+                    print_message("Your password has not been leaked", "SUCCESS", "green")
         case 3:
             print_rule_of_thumbs()
         case 4:
             print("[green]Exiting...[green]")
             exit(0)
 
-def print_error_message(message: str)-> None:
+def print_message(message: str, header, color)-> None:
     clear()
-    print("[red]=================ERROR==================[red]\n")
-    print(f"[red]{message}[red]\n")
-    print("[red]Press any Key to continue...[red]")
+    print(f"[{color}]================={header}==================[{color}]\n")
+    print(f"[{color}]{message}[{color}]\n")
+    print("[green]Press return Key to continue...[green]")
     input()
 
 def print_rule_of_thumbs():
@@ -55,17 +60,14 @@ def print_rule_of_thumbs():
     print("[green]=========================================[green]")
     print("[green]        RULE OF THUMBS                  [green]")
     print("[green]=========================================[green]")
-    print("[green]       [1] Use a password manager        [green]")
-    print("[green]       [2] Use a passphrase              [green]")
-    print("[green]       [3] Use 2FA                       [green]")
-    print("[green]       [5] Use a different password for every account[green]")
-    print("[green]       [6] Use a password generator      [green]")
-    print("[green]       [7] Use a password strength checker[green]")
-    print("[green]       [8] Use a password leak checker   [green]")
-    print("[green]       [9] Use a password policy         [green]")
-    print("[green]       [10] Use a passwordless login (PASSKEY)[green]")
+    print("[green]       [1] Use a unique password for every account[green]")
+    print("[green]       [2] Enable Two-Factor Authentication (2FA)[green]")
+    print("[green]       [3] Use a passphrase (e.g., three random words)[green]")
+    print("[green]       [4] Use a password generator[green]")
+    print("[green]       [5] Use a password manager[green]")
+    print("[green]       [6] Consider passwordless logins (e.g., passkeys)[green]")
     print("[green]=========================================[green]")
-    print("[green]       Press any key to go back          [green]")
+    print("[green]       Press return key to go back          [green]")
     input()
 
 def have_i_been_pwned_menu() -> str:
