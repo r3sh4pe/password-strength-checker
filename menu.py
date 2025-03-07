@@ -1,6 +1,7 @@
 from rich import print
 import os
-from password_util import get_password, check_have_i_been_pwned, check_password_local, calc_local_score
+from password_util import get_password, check_have_i_been_pwned, check_password_local, calc_local_score, \
+    check_against_wordlists
 
 clear = lambda: os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -9,12 +10,13 @@ def print_menu() -> str:
     print("[green]=========================================[green]")
     print("[green]        PASSWORD-STRENGTH CHECKER        [green]")
     print("[green]=========================================[green]")
-    print("[green]       [1] Check password strength (local)       [green]")
-    print("[green]       [2] Check password leak (online)           [green]")
-    print("[green]       [3] Rule of Thumbs                [green]")
-    print("[green]       [4] Exit                          [green]")
+    print("[green]       [1] Check password strength (local)[green]")
+    print("[green]       [2] Check against local wordlists [green]")
+    print("[green]       [3] Check password leak (online)  [green]")
+    print("[green]       [4] Rule of Thumbs                [green]")
+    print("[green]       [5] Exit                          [green]")
     print("[green]=========================================[green]")
-    print("[green]       Enter your choice (1-4):          [green]")
+    print("[green]       Enter your choice (1-5):          [green]")
     return input()
 
 def handle_user_input(user_input: str):
@@ -22,11 +24,9 @@ def handle_user_input(user_input: str):
     try:
         input_as_int = int(user_input)
     except ValueError:
-        raise ValueError("Invalid input. Input was not a number. Please enter a number between 1-4.")
-        return
-    if not input_as_int or input_as_int < 1 or input_as_int > 4:
-        raise ValueError("Invalid input. Please enter a number between 1-4.")
-        return
+        raise ValueError("Invalid input. Input was not a number. Please enter a number between 1-5.")
+    if not input_as_int or input_as_int < 1 or input_as_int > 5:
+        raise ValueError("Invalid input. Please enter a number between 1-5.")
 
     match input_as_int:
         case 1:
@@ -37,6 +37,15 @@ def handle_user_input(user_input: str):
                 check_result_local: dict[str, bool] = check_password_local(password)
                 print_local_result(check_result_local)
         case 2:
+            password: str = get_password()
+            if not password:
+                return
+            else:
+                if check_against_wordlists(password):
+                    print_message("Your password is in a wordlist", "ERROR", "red")
+                else:
+                    print_message("Your password is not in a wordlist", "SUCCESS)", "green")
+        case 3:
             password: str = have_i_been_pwned_menu()
             if not password:
                 return
@@ -47,9 +56,9 @@ def handle_user_input(user_input: str):
                     print_message("This does not mean that your user/password combination has been leaked. But the password will be in wordlists.\n\nYou can look at https://haveibeenpwned.com/ if your account has been leaked.", "INFORMATION", "yellow")
                 else:
                     print_message("Your password has not been leaked", "SUCCESS", "green")
-        case 3:
-            print_rule_of_thumbs()
         case 4:
+            print_rule_of_thumbs()
+        case 5:
             print("[green]Exiting...[green]")
             exit(0)
 
@@ -120,9 +129,9 @@ def print_local_result(check_result: dict[str,bool])->None:
     if not check_result["length"]:
         print("[red]Password must be at least 12 characters[red]")
         print(f"[red]Score: {score}/{total} => {percentage}% [red]")
-    elif(percentage == 100):
+    elif percentage == 100:
         print(f"[green]Score: {score}/{total} => {percentage}% [green]")
-    elif(percentage >= 80):
+    elif percentage >= 80:
         print(f"[yellow]Score: {score}/{total} => {percentage}% [yellow]")
     else:
         print(f"[red]Score: {score}/{total} => {percentage}% [red]")
@@ -149,7 +158,7 @@ def print_local_result(check_result: dict[str,bool])->None:
         print("[green]Special char: OK [green]")
     else:
         print("[red]Special char: FAILED [red]")
-    if(percentage >= 80):
+    if percentage >= 80:
         print("[yellow]==========================================[yellow]")
         print("[yellow] You should also check for password leaks  [yellow]")
         print("[yellow]==========================================[yellow]")

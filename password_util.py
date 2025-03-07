@@ -1,6 +1,7 @@
 from getpass import getpass
 import hashlib
 import requests
+import os
 
 def get_password() -> str:
     return getpass()
@@ -37,9 +38,19 @@ def check_password_local(password: str) -> dict[str, bool]:
             result["special"] = True
     return result
 
+
+def check_against_wordlists(password: str) -> bool:
+    wordlist_dir = './password_lists/'
+    for wordlist_file in os.listdir(wordlist_dir):
+        with open(os.path.join(wordlist_dir, wordlist_file), 'r') as file:
+            if password in file.read().splitlines():
+                return True
+    return False
+
+
 def calc_local_score(check_result: dict[str, bool]) -> tuple[int, int, int]:
     score: int = 0
     for value in check_result.values():
         if value:
             score += 1
-    return (score, len(check_result), int(score/len(check_result)*100))
+    return score, len(check_result), int(score / len(check_result) * 100)
