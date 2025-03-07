@@ -16,5 +16,30 @@ def check_have_i_been_pwned(password: str) -> tuple[bool, int]:
             return (True, int(count))
     return (False, 0)
 
-def check_password_local() -> str:
-    return ""
+def check_password_local(password: str) -> dict[str, bool]:
+    result: dict[str, bool] = {
+        "length": False,
+        "upper": False,
+        "lower": False,
+        "digit": False,
+        "special": False
+    }
+    if len(password) >= 12:
+        result["length"] = True
+    for char in password:
+        if char.isupper():
+            result["upper"] = True
+        if char.islower():
+            result["lower"] = True
+        if char.isdigit():
+            result["digit"] = True
+        if not char.isalnum():
+            result["special"] = True
+    return result
+
+def calc_local_score(check_result: dict[str, bool]) -> tuple[int, int, int]:
+    score: int = 0
+    for value in check_result.values():
+        if value:
+            score += 1
+    return (score, len(check_result), int(score/len(check_result)*100))

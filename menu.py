@@ -1,6 +1,6 @@
 from rich import print
 import os
-from password_util import get_password, check_have_i_been_pwned, check_password_local
+from password_util import get_password, check_have_i_been_pwned, check_password_local, calc_local_score
 
 clear = lambda: os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -9,8 +9,8 @@ def print_menu() -> str:
     print("[green]=========================================[green]")
     print("[green]        PASSWORD-STRENGTH CHECKER        [green]")
     print("[green]=========================================[green]")
-    print("[green]       [1] Check password strength       [green]")
-    print("[green]       [2] Check password leak           [green]")
+    print("[green]       [1] Check password strength (local)       [green]")
+    print("[green]       [2] Check password leak (online)           [green]")
     print("[green]       [3] Rule of Thumbs                [green]")
     print("[green]       [4] Exit                          [green]")
     print("[green]=========================================[green]")
@@ -31,6 +31,11 @@ def handle_user_input(user_input: str):
     match input_as_int:
         case 1:
             password: str = check_password_local_menu()
+            if not password:
+                return
+            else:
+                check_result_local: dict[str, bool] = check_password_local(password)
+                print_local_result(check_result_local)
         case 2:
             password: str = have_i_been_pwned_menu()
             if not password:
@@ -96,6 +101,7 @@ def check_password_local_menu() -> str:
     print("[green]             Information:                [green]")
     print("[green] Your password will be checked against  [green]")
     print("[green] the local password rules.               [green]")
+    print("[yellow] 12 characters, upper- and lowercase,\n number and special charackter[yellow]")
     print("[green]=========================================[green]")
     print("[green]       Enter your password:              [green]")
     print("[green]    (or return for previous menu)         [green]")
@@ -103,3 +109,51 @@ def check_password_local_menu() -> str:
     if not password:
         return ""
     return password
+
+def print_local_result(check_result: dict[str,bool])->None:
+    clear()
+    score_info: tuple[int, int, int] = calc_local_score(check_result)
+    score, total, percentage = score_info
+    print("[green]=========================================[green]")
+    print("[green]        Password Strength Result         [green]")
+    print("[green]=========================================[green]")
+    if not check_result["length"]:
+        print("[red]Password must be at least 12 characters[red]")
+        print(f"[red]Score: {score}/{total} => {percentage}% [red]")
+    elif(percentage == 100):
+        print(f"[green]Score: {score}/{total} => {percentage}% [green]")
+    elif(percentage >= 80):
+        print(f"[yellow]Score: {score}/{total} => {percentage}% [yellow]")
+    else:
+        print(f"[red]Score: {score}/{total} => {percentage}% [red]")
+    print("[green]=========================================[green]")
+    print("[green]       Detailed Result                   [green]")
+    print("[green]=========================================[green]")
+    if check_result["length"]:
+        print("[green]Length: OK [green]")
+    else:
+        print("[red]Length: FAILED [red]")
+    if check_result["upper"]:
+        print("[green]Upper case: OK [green]")
+    else:
+        print("[red]Upper case: FAILED [red]")
+    if check_result["lower"]:
+        print("[green]Lower case: OK [green]")
+    else:
+        print("[red]Lower case: FAILED [red]")
+    if check_result["digit"]:
+        print("[green]Digit: OK [green]")
+    else:
+        print("[red]Digit: FAILED [red]")
+    if check_result["special"]:
+        print("[green]Special char: OK [green]")
+    else:
+        print("[red]Special char: FAILED [red]")
+    if(percentage >= 80):
+        print("[yellow]==========================================[yellow]")
+        print("[yellow] You should also check for password leaks  [yellow]")
+        print("[yellow]==========================================[yellow]")
+    else:
+        print("[green]=========================================[green]")
+    print("[green]Press return Key to continue...[green]")
+    input()
